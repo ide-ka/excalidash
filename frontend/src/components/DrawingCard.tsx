@@ -10,6 +10,12 @@ import { exportDrawingToFile } from '../utils/exportUtils';
 
 import * as api from '../api';
 
+type HydratedDrawingData = {
+  elements: any[];
+  appState: any;
+  files: Record<string, any>;
+};
+
 interface DrawingCardProps {
   drawing: DrawingSummary;
   collections: Collection[];
@@ -52,27 +58,39 @@ export const DrawingCard: React.FC<DrawingCardProps> = ({
   const [previewSvg, setPreviewSvg] = useState<string | null>(drawing.preview ?? null);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [isExporting, setIsExporting] = useState(false);
-  const [fullData, setFullData] = useState<{
-    elements: any[];
-    appState: any;
-    files: Record<string, any> | null;
-  } | null>(null);
+  const [fullData, setFullData] = useState<HydratedDrawingData | null>(null);
 
   const fullDataRef = React.useRef(fullData);
   fullDataRef.current = fullData;
+  const fullDataPromiseRef = React.useRef<Promise<HydratedDrawingData> | null>(null);
+
+  useEffect(() => {
+    setFullData(null);
+    fullDataPromiseRef.current = null;
+  }, [drawing.id]);
 
   const ensureFullData = useCallback(async () => {
     if (fullDataRef.current) {
       return fullDataRef.current;
     }
-    const fullDrawing = await api.getDrawing(drawing.id);
-    const payload = {
-      elements: fullDrawing.elements || [],
-      appState: fullDrawing.appState || {},
-      files: fullDrawing.files || {},
-    };
-    setFullData(payload);
-    return payload;
+    if (fullDataPromiseRef.current) {
+      return fullDataPromiseRef.current;
+    }
+    const promise = api.getDrawing(drawing.id).then((fullDrawing) => {
+      const payload: HydratedDrawingData = {
+        elements: fullDrawing.elements || [],
+        appState: fullDrawing.appState || {},
+        files: fullDrawing.files || {},
+      };
+      setFullData(payload);
+      fullDataPromiseRef.current = null;
+      return payload;
+    }).catch((error) => {
+      fullDataPromiseRef.current = null;
+      throw error;
+    });
+    fullDataPromiseRef.current = promise;
+    return promise;
   }, [drawing.id]);
 
   useEffect(() => {

@@ -137,9 +137,11 @@ const buildDrawingsCacheKey = (keyParts: {
   collectionFilter: string;
   includeData: boolean;
 }) =>
-  `${keyParts.searchTerm}|${keyParts.collectionFilter}|${
-    keyParts.includeData ? "full" : "summary"
-  }`;
+  JSON.stringify([
+    keyParts.searchTerm,
+    keyParts.collectionFilter,
+    keyParts.includeData ? "full" : "summary",
+  ]);
 
 const getCachedDrawingsBody = (key: string): Buffer | null => {
   const entry = drawingsCache.get(key);
@@ -796,7 +798,7 @@ app.put("/drawings/:id", async (req, res) => {
       where: { id },
       data,
     });
-    invalidateDrawingsCache();
+    await invalidateDrawingsCache();
 
     console.log("[API] Update complete", {
       id,
@@ -925,7 +927,7 @@ app.delete("/collections/:id", async (req, res) => {
         where: { id },
       }),
     ]);
-    invalidateDrawingsCache();
+    await invalidateDrawingsCache();
 
     res.json({ success: true });
   } catch (error) {
@@ -1191,9 +1193,9 @@ app.post("/import/sqlite", upload.single("db"), async (req, res) => {
 
     // Reinitialize Prisma client
     await prisma.$disconnect();
+    invalidateDrawingsCache();
 
     res.json({ success: true, message: "Database imported successfully" });
-    invalidateDrawingsCache();
   } catch (error) {
     console.error(error);
     if (req.file) {

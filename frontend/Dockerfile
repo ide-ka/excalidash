@@ -4,14 +4,14 @@ FROM node:20-alpine AS builder
 WORKDIR /app/frontend
 
 # Copy package files first for better caching
-COPY frontend/package*.json ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm ci
 
 # Copy source code and config files
-COPY frontend/ ./
-COPY VERSION ../VERSION
+COPY . ./
+COPY ../VERSION ../VERSION
 
 # Build arguments
 ARG VITE_APP_VERSION
@@ -29,10 +29,10 @@ FROM nginx:alpine
 RUN apk add --no-cache gettext
 
 # Copy nginx config template (will be processed at runtime)
-COPY frontend/nginx.conf.template /etc/nginx/nginx.conf.template
+COPY nginx.conf.template /etc/nginx/nginx.conf.template
 
 # Copy entrypoint script
-COPY frontend/docker-entrypoint.sh /docker-entrypoint.sh
+COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 # Copy built application from builder

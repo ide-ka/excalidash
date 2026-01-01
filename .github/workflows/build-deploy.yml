@@ -44,7 +44,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run malware scan on backend code
-        uses: hugoalh/scan-virus-ghaction/clamav@v0.22.1
+        uses: hugoalh/scan-virus-ghaction/clamav@v0.20.1
         with:
           found_log: true
           found_summary: true
@@ -115,7 +115,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run malware scan on frontend code
-        uses: hugoalh/scan-virus-ghaction/clamav@v0.22.1
+        uses: hugoalh/scan-virus-ghaction/clamav@v0.20.1
         with:
           found_log: true
           found_summary: true

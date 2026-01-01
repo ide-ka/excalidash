@@ -44,10 +44,17 @@ jobs:
           fetch-depth: 0
 
       - name: Run malware scan on backend code
+        id: malware-scan-backend
         uses: hugoalh/scan-virus-ghaction/clamav@v0.20.1
         with:
           found_log: true
           found_summary: true
+
+      - name: Fail if malware detected in backend
+        if: steps.malware-scan-backend.outputs.found == 'true'
+        run: |
+          echo "::error::Malware detected in backend code! Build aborted."
+          exit 1
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -115,10 +122,17 @@ jobs:
           fetch-depth: 0
 
       - name: Run malware scan on frontend code
+        id: malware-scan-frontend
         uses: hugoalh/scan-virus-ghaction/clamav@v0.20.1
         with:
           found_log: true
           found_summary: true
+
+      - name: Fail if malware detected in frontend
+        if: steps.malware-scan-frontend.outputs.found == 'true'
+        run: |
+          echo "::error::Malware detected in frontend code! Build aborted."
+          exit 1
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

@@ -11,7 +11,6 @@ RUN npm ci
 
 # Copy source code and config files
 COPY . ./
-COPY ../VERSION ../VERSION
 
 # Build arguments
 ARG VITE_APP_VERSION

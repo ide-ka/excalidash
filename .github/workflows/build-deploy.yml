@@ -44,13 +44,10 @@ jobs:
           fetch-depth: 0
 
       - name: Run malware scan on backend code
-        uses: djdefi/clamav-action@v1
+        uses: hugoalh/scan-virus-ghaction/clamav@v0.22.1
         with:
-          path: ./backend
-          exclude: |
-            node_modules
-            .git
-          fail_on_virus: true
+          found_log: true
+          found_summary: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -118,13 +115,10 @@ jobs:
           fetch-depth: 0
 
       - name: Run malware scan on frontend code
-        uses: djdefi/clamav-action@v1
+        uses: hugoalh/scan-virus-ghaction/clamav@v0.22.1
         with:
-          path: ./frontend
-          exclude: |
-            node_modules
-            .git
-          fail_on_virus: true
+          found_log: true
+          found_summary: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

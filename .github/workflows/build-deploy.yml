@@ -43,6 +43,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Run malware scan on backend code
+        uses: djdefi/clamav-action@v1
+        with:
+          path: ./backend
+          exclude: |
+            node_modules
+            .git
+          fail_on_virus: true
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -107,6 +116,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Run malware scan on frontend code
+        uses: djdefi/clamav-action@v1
+        with:
+          path: ./frontend
+          exclude: |
+            node_modules
+            .git
+          fail_on_virus: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

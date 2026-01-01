@@ -67,6 +67,7 @@ jobs:
             ${{ github.event.inputs.version }}
 
       - name: Build and push Docker image
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: ./backend
@@ -80,7 +81,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/${{ github.repository }}/backend:${{ steps.meta.outputs.version }}
+          image-ref: ghcr.io/${{ github.repository }}/backend@${{ steps.build.outputs.digest }}
           format: 'sarif'
           output: 'trivy-backend-results.sarif'
 
@@ -131,6 +132,7 @@ jobs:
             ${{ github.event.inputs.version }}
 
       - name: Build and push Docker image
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
@@ -144,7 +146,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/${{ github.repository }}/frontend:${{ steps.meta.outputs.version }}
+          image-ref: ghcr.io/${{ github.repository }}/frontend@${{ steps.build.outputs.digest }}
           format: 'sarif'
           output: 'trivy-frontend-results.sarif'
 
